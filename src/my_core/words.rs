@@ -1,3 +1,5 @@
+use rand::seq::SliceRandom;
+
 pub fn get_words() -> Vec<&'static str> {
     vec![
         "aba",
@@ -7752,4 +7754,14 @@ pub fn get_words() -> Vec<&'static str> {
         "zunir",
         "zunzum",
     ]
+}
+
+/*
+    Recebe como parâmetro um vetor de &str e retorna
+    um Option de uma &str específica de forma aleatória
+*/
+pub fn random_word<'a>(words: &'a Vec<&'a str>) -> Option<&'a str> {
+    let mut range = rand::thread_rng();
+    let choose = words.choose(&mut range);
+    choose.copied()
 }

@@ -32,7 +32,7 @@ fn main() {
     let words = words::get_words();
 
     loop {
-        match hangman_game::random_word(&words) {
+        match hangman_game::words::random_word(&words) {
             Some(word) => {
                 hangman_game::execute_all(word);
                 let rerun_bool = do_rerun();

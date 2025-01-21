@@ -1,48 +1,12 @@
 pub mod my_core;
 
-pub use my_core::words;
+pub use my_core::{words, EndState};
 
-use rand::seq::SliceRandom;
 use std::io;
 use crossterm::{
     execute,
     terminal::{Clear, ClearType},
 };
-
-pub enum GameEndState {
-    OutOfAttempts, 
-    PlayerWon,
-    GameNotEnded,
-}
-
-impl GameEndState {
-    // faz a checagem da jogada e seu estado atual
-    fn check_game_end_state(rem_att: u8, current_attempt: &str) -> GameEndState {
-        // caso o jogador tenha gastado todas as usas tentativas disponíveis
-        if rem_att == 0 { 
-            return GameEndState::OutOfAttempts;
-        } 
-        // caso não contenha mais underscores, ou seja, 
-        // a palavra tenha sido adivinhada
-        else if !current_attempt.contains("_") { 
-            return GameEndState::PlayerWon;
-        } 
-        // jogo continua normalmente...
-        else { 
-            return  GameEndState::GameNotEnded;
-        }
-    }
-}
-
-/*
-    Recebe como parâmetro um vetor de &str e retorna
-    um Option de uma &str específica de forma aleatória
-*/
-pub fn random_word<'a>(words: &'a Vec<&'a str>) -> Option<&'a str> {
-    let mut range = rand::thread_rng();
-    let choose = words.choose(&mut range);
-    choose.copied()
-}
 
 /*
     Retorna o caractere que foi digitado pelo usuário;
@@ -68,6 +32,8 @@ fn user_input_char() -> char {
         // converte a string para char
         let input_char: char = match input.trim().chars().next() {
             Some(c) => c,
+
+            // HACK: Precisa-se lidar com o erro de uma melhor forma
             None => {
                 println!("Erro não tratado!");
                 std::process::exit(1);
@@ -231,13 +197,13 @@ pub fn execute_all(word: &str) {
         tot_attempts += 1;
         char_attempts.push(input_char);
 
-        match GameEndState::check_game_end_state(rem_att, &current_attempt) {
-            GameEndState::OutOfAttempts => {
+        match EndState::check_game_end_state(rem_att, &current_attempt) {
+            EndState::OutOfAttempts => {
                 execute!(io::stdout(), Clear(ClearType::All)).unwrap(); // limpa o terminal
                 println!("Fim de jogo!!\nA palavra era {word}.\nJogue novamente :)");
                 break;
             }
-            GameEndState::PlayerWon => {
+            EndState::PlayerWon => {
                 // Chamado para caso o usuário acerte a palavra
                 // Dá opções finais após o acerto da palavra
                 execute!(io::stdout(), Clear(ClearType::All)).unwrap(); // limpa o terminal
@@ -245,7 +211,7 @@ pub fn execute_all(word: &str) {
                 final_choices(word, tot_attempts, char_attempts, attempts);
                 break;
             }
-            GameEndState::GameNotEnded => {
+            EndState::GameNotEnded => {
                 continue;
             }
         }
