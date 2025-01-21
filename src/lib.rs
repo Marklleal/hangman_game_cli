@@ -1,4 +1,6 @@
-mod words;
+pub mod my_core;
+
+pub use my_core::words;
 
 use rand::seq::SliceRandom;
 use std::io;
@@ -154,7 +156,7 @@ fn remaining_attempts(mut rem_att: u8) -> u8 {
 }
 
 // Pergunta ao usuário se é de seu desejo o rerun do programa
-pub fn do_rerun() {
+pub fn do_rerun() -> bool {
     let mut input = String::new();
 
     println!("Deseja jogar novamente?(S/N)");
@@ -162,14 +164,11 @@ pub fn do_rerun() {
         .read_line(&mut input)
         .expect("Falha ao ler linha!");
 
+    // retorna um boolean que dita o reinicio do programa caso seja true
     if input.trim().eq_ignore_ascii_case("s") {
-        execute!(io::stdout(), Clear(ClearType::All)).unwrap(); // limpa o terminal
-        // crate::main
-        
-        // main(); // Executa o programa
+        true
     } else {
-        println!("Saindo...");
-        std::process::exit(1);
+        false
     }
 }
 
